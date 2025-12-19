@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  ATTENDANT
+  CLIENT
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(ATTENDANT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Client {
+  id            String   @id @default(uuid())
+  name          String
+  cnpj          String   @unique
+  responsible   String
+  email         String
+  whatsapp      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  exams         Exam[]
+  appointments  Appointment[]
+  documents     Document[]
+}
+
+model Exam {
+  id            String   @id @default(uuid())
+  name          String   // e.g., ASO, PCMSO, etc.
+  clientId      String
+  client        Client   @relation(fields: [clientId], references: [id])
+  examDate      DateTime
+  renewalDate   DateTime?
+  status        String   @default("PENDING") // PENDING, COMPLETED, EXPIRED
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  documents     Document[]
+}
+
+model Appointment {
+  id            String   @id @default(uuid())
+  clientId      String
+  client        Client   @relation(fields: [clientId], references: [id])
+  date          DateTime
+  description   String?
+  status        String   @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Document {
+  id        String   @id @default(uuid())
+  name      String
+  path      String
+  type      String   // PDF, IMAGE, etc.
+  clientId  String?
+  client    Client?  @relation(fields: [clientId], references: [id])
+  examId    String?
+  exam      Exam?    @relation(fields: [examId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  fromMe    Boolean
+  text      String
+  whatsapp  String   // Client whatsapp number
+  timestamp DateTime @default(now())
+}
