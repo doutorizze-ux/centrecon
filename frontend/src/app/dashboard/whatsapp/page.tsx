@@ -1,220 +1,244 @@
 "use client";
 
 import { useState } from "react";
-import { MessageSquare, Send, User, ChevronLeft } from "lucide-react";
+import { Send, Search, Paperclip, MoreVertical, CheckCheck } from "lucide-react";
 
 export default function WhatsAppWeb() {
-    const [selectedChat, setSelectedChat] = useState<any>(null);
+  const [selectedChat, setSelectedChat] = useState<number | null>(null);
+  const [messageInput, setMessageInput] = useState("");
+  const [messages, setMessages] = useState([
+    { id: 1, text: "Olá! Gostaria de agendar um exame admissional.", sender: "client", time: "10:30" },
+    { id: 2, text: "Claro! Para qual cargo seria?", sender: "me", time: "10:32" },
+  ]);
 
-    const chats = [
-        { id: 1, name: "João Silva (ConstruTech)", lastMessage: "Pode me enviar o PCMSO?", time: "10:30", unread: 2 },
-        { id: 2, name: "Maria Oliveira (LogExpress)", lastMessage: "Obrigada pelo retorno.", time: "09:15", unread: 0 },
-        { id: 3, name: "Pedro Santos (Indústria Metal)", lastMessage: "Agendamento confirmado.", time: "Ontem", unread: 0 },
-    ];
+  const chats = [
+    { id: 1, name: "Metalúrgica ABC", lastMsg: "Claro! Para qual cargo seria?", time: "10:32", unread: 0, avatar: "M" },
+    { id: 2, name: "João Silva", lastMsg: "Obrigado pelo envio.", time: "09:15", unread: 2, avatar: "J" },
+    { id: 3, name: "Construtora Norte", lastMsg: "Aguardando orçamento.", time: "Ontem", unread: 0, avatar: "C" },
+  ];
 
-    return (
-        <div className="whatsapp-page card">
-            <div className="whatsapp-grid">
-                <div className="chat-list">
-                    <div className="sidebar-title">Conversas via WhatsApp</div>
-                    {chats.map(chat => (
-                        <div
-                            key={chat.id}
-                            className={`chat-item ${selectedChat?.id === chat.id ? "active" : ""}`}
-                            onClick={() => setSelectedChat(chat)}
-                        >
-                            <div className="avatar"><User size={20} /></div>
-                            <div className="chat-info">
-                                <div className="chat-top">
-                                    <span className="chat-name">{chat.name}</span>
-                                    <span className="chat-time">{chat.time}</span>
-                                </div>
-                                <div className="chat-bottom">
-                                    <span className="chat-msg">{chat.lastMessage}</span>
-                                    {chat.unread > 0 && <span className="unread-badge">{chat.unread}</span>}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+  const handleSend = () => {
+    if (!messageInput.trim()) return;
+    setMessages([...messages, {
+      id: Date.now(),
+      text: messageInput,
+      sender: "me",
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }]);
+    setMessageInput("");
+  };
+
+  return (
+    <div className="wa-layout">
+      <div className="wa-sidebar">
+        <div className="wa-header">
+          <h2>Chats</h2>
+          <div className="wa-actions">
+            <MoreVertical size={20} color="#64748b" />
+          </div>
+        </div>
+        <div className="wa-search">
+          <div className="search-box">
+            <Search size={18} color="#94a3b8" />
+            <input type="text" placeholder="Pesquisar conversa" />
+          </div>
+        </div>
+        <div className="chat-list">
+          {chats.map(chat => (
+            <div
+              key={chat.id}
+              className={`chat-item ${selectedChat === chat.id ? "active" : ""}`}
+              onClick={() => setSelectedChat(chat.id)}
+            >
+              <div className="chat-avatar">{chat.avatar}</div>
+              <div className="chat-info">
+                <div className="chat-top">
+                  <span className="chat-name">{chat.name}</span>
+                  <span className="chat-time">{chat.time}</span>
                 </div>
-
-                <div className="chat-window">
-                    {selectedChat ? (
-                        <>
-                            <div className="chat-header">
-                                <div className="avatar"><User size={20} /></div>
-                                <div>
-                                    <div className="chat-name">{selectedChat.name}</div>
-                                    <div className="chat-status">Online</div>
-                                </div>
-                            </div>
-                            <div className="messages-area">
-                                <div className="message received">
-                                    Olá! Gostaria de saber quais documentos preciso para o exame.
-                                    <span className="msg-time">10:25</span>
-                                </div>
-                                <div className="message sent">
-                                    Bom dia, João! Para o ASO você precisa trazer o RG e o último laudo se tiver.
-                                    <span className="msg-time">10:28</span>
-                                </div>
-                                <div className="message received">
-                                    {selectedChat.lastMessage}
-                                    <span className="msg-time">10:30</span>
-                                </div>
-                            </div>
-                            <div className="input-area">
-                                <input type="text" placeholder="Digite uma mensagem..." />
-                                <button className="btn-send"><Send size={20} /></button>
-                            </div>
-                        </>
-                    ) : (
-                        <div className="empty-chat">
-                            <MessageSquare size={48} />
-                            <p>Selecione uma conversa para começar o atendimento.</p>
-                        </div>
-                    )}
+                <div className="chat-bottom">
+                  <span className="chat-preview">{chat.lastMsg}</span>
+                  {chat.unread > 0 && <span className="unread-badge">{chat.unread}</span>}
                 </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="wa-main">
+        {selectedChat ? (
+          <>
+            <div className="wa-chat-header">
+              <div className="chat-avatar-sm">M</div>
+              <div className="wa-chat-details">
+                <span className="chat-header-name">Metalúrgica ABC</span>
+                <span className="chat-status">Online</span>
+              </div>
+              <div className="wa-header-actions">
+                <Search size={20} />
+                <MoreVertical size={20} />
+              </div>
             </div>
 
-            <style jsx>{`
-        .whatsapp-page {
-          height: calc(100vh - 200px);
-          padding: 0;
-          display: flex;
-          overflow: hidden;
-        }
-        .whatsapp-grid {
-          display: grid;
-          grid-template-columns: 350px 1fr;
-          width: 100%;
-        }
-        .chat-list {
-          border-right: 1px solid var(--border);
-          overflow-y: auto;
-        }
-        .sidebar-title {
-          padding: 1.5rem;
-          font-weight: 700;
-          border-bottom: 1px solid var(--border);
-        }
-        .chat-item {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          padding: 1.25rem 1.5rem;
-          cursor: pointer;
-          transition: background 0.2s;
-          border-bottom: 1px solid #f1f5f9;
-        }
-        .chat-item:hover { background: #f8fafc; }
-        .chat-item.active { background: #f1f5f9; border-left: 4px solid var(--primary); }
-        
-        .avatar {
-          width: 48px;
-          height: 48px;
-          background: #e2e8f0;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #64748b;
-          flex-shrink: 0;
-        }
-        .active .avatar { background: var(--accent); color: var(--primary); }
-        
-        .chat-info { flex: 1; overflow: hidden; }
-        .chat-top { display: flex; justify-content: space-between; margin-bottom: 0.25rem; }
-        .chat-name { font-weight: 600; font-size: 0.95rem; }
-        .chat-time { font-size: 0.75rem; color: #94a3b8; }
-        .chat-bottom { display: flex; justify-content: space-between; align-items: center; }
-        .chat-msg { font-size: 0.85rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .unread-badge { background: var(--primary); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
-        
-        .chat-window {
-          display: flex;
-          flex-direction: column;
-          background: #f8fafc;
-        }
-        .chat-header {
-          padding: 1rem 2rem;
-          background: white;
-          border-bottom: 1px solid var(--border);
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-        }
-        .chat-status { font-size: 0.75rem; color: var(--primary); font-weight: 600; }
-        
-        .messages-area {
-          flex: 1;
-          padding: 2rem;
-          overflow-y: auto;
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-        }
-        .message {
-          max-width: 70%;
-          padding: 0.75rem 1rem;
-          border-radius: 12px;
-          font-size: 0.95rem;
-          position: relative;
-        }
-        .message.received {
-          align-self: flex-start;
-          background: white;
-          border-bottom-left-radius: 2px;
-          box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-        .message.sent {
-          align-self: flex-end;
-          background: var(--accent);
-          color: var(--primary-hover);
-          border-bottom-right-radius: 2px;
-        }
-        .msg-time {
-          display: block;
-          font-size: 0.7rem;
-          text-align: right;
-          margin-top: 0.25rem;
-          opacity: 0.7;
-        }
-        
-        .input-area {
-          padding: 1.5rem 2rem;
-          background: white;
-          border-top: 1px solid var(--border);
-          display: flex;
-          gap: 1rem;
-        }
-        .input-area input {
-          flex: 1;
-          padding: 0.75rem 1.25rem;
-          border-radius: 25px;
-          border: 1px solid var(--border);
-          background: var(--muted);
-          outline: none;
-        }
-        .btn-send {
-          background: var(--primary);
-          color: white;
-          width: 45px;
-          height: 45px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .empty-chat {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          color: #94a3b8;
-          gap: 1rem;
-        }
-      `}</style>
-        </div>
-    );
+            <div className="wa-messages">
+              {messages.map(msg => (
+                <div key={msg.id} className={`message-row ${msg.sender === 'me' ? 'sent' : 'received'}`}>
+                  <div className="message-bubble">
+                    <p>{msg.text}</p>
+                    <div className="msg-meta">
+                      <span>{msg.time}</span>
+                      {msg.sender === 'me' && <CheckCheck size={14} className="read-check" />}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="wa-input-area">
+              <button className="attach-btn"><Paperclip size={20} /></button>
+              <input
+                type="text"
+                placeholder="Digite uma mensagem"
+                value={messageInput}
+                onChange={(e) => setMessageInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+              />
+              <button className="send-btn" onClick={handleSend}>
+                <Send size={20} />
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="wa-placeholder">
+            <div className="placeholder-icon">
+              <Send size={48} />
+            </div>
+            <h3>WhatsApp Web Integrado</h3>
+            <p>Selecione uma conversa para iniciar o atendimento.</p>
+          </div>
+        )}
+      </div>
+
+      <style jsx>{`
+                .wa-layout {
+                    display: flex;
+                    height: calc(100vh - 140px);
+                    background: white;
+                    border-radius: 20px;
+                    border: 1px solid var(--border);
+                    overflow: hidden;
+                    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+                }
+                
+                /* Sidebar */
+                .wa-sidebar {
+                    width: 350px;
+                    border-right: 1px solid var(--border);
+                    display: flex;
+                    flex-direction: column;
+                    background: white;
+                }
+                .wa-header {
+                    padding: 1.5rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                }
+                .wa-header h2 { font-size: 1.25rem; color: var(--secondary); }
+                .wa-search { padding: 0 1rem 1rem; }
+                .search-box {
+                    background: #f1f5f9;
+                    border-radius: 12px;
+                    padding: 0.75rem 1rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                }
+                .search-box input { border: none; background: transparent; width: 100%; outline: none; }
+                
+                .chat-list { flex: 1; overflow-y: auto; }
+                .chat-item {
+                    display: flex;
+                    gap: 1rem;
+                    padding: 1rem 1.5rem;
+                    cursor: pointer;
+                    transition: 0.2s;
+                    border-bottom: 1px solid #f8fafc;
+                }
+                .chat-item:hover { background: #f8fafc; }
+                .chat-item.active { background: #eff6ff; border-left: 3px solid var(--primary); }
+                
+                .chat-avatar {
+                    width: 48px;
+                    height: 48px;
+                    background: #e2e8f0;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 700;
+                    color: var(--secondary);
+                }
+                .chat-info { flex: 1; min-width: 0; }
+                .chat-top { display: flex; justify-content: space-between; margin-bottom: 0.25rem; }
+                .chat-name { font-weight: 600; font-size: 0.95rem; color: var(--secondary); }
+                .chat-time { font-size: 0.75rem; color: var(--muted); }
+                .chat-bottom { display: flex; justify-content: space-between; align-items: center; }
+                .chat-preview { font-size: 0.85rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                .unread-badge { background: var(--primary); color: white; font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 10px; }
+
+                /* Main Chat */
+                .wa-main { flex: 1; display: flex; flex-direction: column; background: #f0f4f8; position: relative; }
+                
+                .wa-chat-header {
+                    background: white;
+                    padding: 1rem 1.5rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    border-bottom: 1px solid var(--border);
+                }
+                .chat-avatar-sm { width: 40px; height: 40px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+                .wa-chat-details { flex: 1; display: flex; flex-direction: column; }
+                .chat-header-name { font-weight: 600; color: var(--secondary); }
+                .chat-status { font-size: 0.8rem; color: var(--primary); }
+                .wa-header-actions { display: flex; gap: 1rem; color: var(--muted); }
+                
+                .wa-messages { flex: 1; padding: 2rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }
+                .message-row { display: flex; }
+                .message-row.sent { justify-content: flex-end; }
+                .message-row.received { justify-content: flex-start; }
+                
+                .message-bubble {
+                    padding: 0.75rem 1rem;
+                    border-radius: 12px;
+                    max-width: 60%;
+                    position: relative;
+                    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+                }
+                .sent .message-bubble { background: #dcfce7; color: var(--secondary); border-top-right-radius: 2px; }
+                .received .message-bubble { background: white; color: var(--secondary); border-top-left-radius: 2px; }
+                
+                .msg-meta { display: flex; align-items: center; gap: 0.25rem; justify-content: flex-end; margin-top: 0.25rem; font-size: 0.7rem; opacity: 0.7; }
+                .read-check { color: var(--primary); }
+                
+                .wa-input-area {
+                    background: white;
+                    padding: 1rem 1.5rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    border-top: 1px solid var(--border);
+                }
+                .attach-btn, .send-btn { background: none; border: none; cursor: pointer; color: var(--muted); padding: 0.5rem; border-radius: 50%; transition: 0.2s; }
+                .send-btn { background: var(--primary); color: white; }
+                .send-btn:hover { background: var(--primary-dark); }
+                .wa-input-area input { flex: 1; padding: 0.75rem 1rem; border-radius: 20px; border: 1px solid var(--border); outline: none; }
+                
+                .wa-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--muted); text-align: center; }
+                .placeholder-icon { width: 80px; height: 80px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); color: var(--primary); }
+            `}</style>
+    </div>
+  );
 }

@@ -3,126 +3,200 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-    LayoutDashboard,
-    Users,
-    FileCheck,
-    Calendar,
-    MessageSquare,
-    Settings,
-    LogOut
+  LayoutDashboard,
+  Users,
+  FileCheck,
+  Calendar,
+  MessageSquare,
+  Settings,
+  LogOut,
+  ChevronRight
 } from "lucide-react";
 
 const menuItems = [
-    { icon: <LayoutDashboard size={20} />, label: "Dashboard", href: "/dashboard" },
-    { icon: <Users size={20} />, label: "Clientes", href: "/dashboard/clients" },
-    { icon: <FileCheck size={20} />, label: "Exames & Laudos", href: "/dashboard/exams" },
-    { icon: <Calendar size={20} />, label: "Agendamentos", href: "/dashboard/scheduling" },
-    { icon: <MessageSquare size={20} />, label: "WhatsApp Chat", href: "/dashboard/whatsapp" },
-    { icon: <Settings size={20} />, label: "Configurações", href: "/dashboard/settings" },
+  { icon: <LayoutDashboard size={20} />, label: "Visão Geral", href: "/dashboard" },
+  { icon: <Users size={20} />, label: "Clientes", href: "/dashboard/clients" },
+  { icon: <FileCheck size={20} />, label: "Exames & Laudos", href: "/dashboard/exams" },
+  { icon: <Calendar size={20} />, label: "Agenda Inteligente", href: "/dashboard/scheduling" },
+  { icon: <MessageSquare size={20} />, label: "WhatsApp Chat", href: "/dashboard/whatsapp" },
+  { icon: <Settings size={20} />, label: "Configurações", href: "/dashboard/settings" },
 ];
 
 export default function Sidebar() {
-    const pathname = usePathname();
+  const pathname = usePathname();
 
-    return (
-        <aside className="sidebar">
-            <div className="sidebar-header">
-                <Link href="/dashboard" className="logo">
-                    <span className="logo-icon">C</span>
-                    <span className="logo-text">Centrecon</span>
-                </Link>
-            </div>
+  return (
+    <aside className="sidebar-premium">
+      <div className="sidebar-header">
+        <div className="logo-box">
+          <div className="logo-inner"></div>
+        </div>
+        <span className="logo-text">Centrecon</span>
+      </div>
 
-            <nav className="sidebar-nav">
-                {menuItems.map((item) => (
-                    <Link
-                        key={item.href}
-                        href={item.href}
-                        className={`nav-item ${pathname === item.href ? "active" : ""}`}
-                    >
-                        {item.icon}
-                        <span>{item.label}</span>
-                    </Link>
-                ))}
-            </nav>
+      <div className="sidebar-section-label">MENU PRINCIPAL</div>
 
-            <div className="sidebar-footer">
-                <button className="nav-item logout">
-                    <LogOut size={20} />
-                    <span>Sair</span>
-                </button>
-            </div>
+      <nav className="sidebar-nav">
+        {menuItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`nav-item ${isActive ? "active" : ""}`}
+            >
+              <div className="nav-icon">{item.icon}</div>
+              <span className="nav-label">{item.label}</span>
+              {isActive && <ChevronRight size={16} className="nav-arrow" />}
+            </Link>
+          );
+        })}
+      </nav>
 
-            <style jsx>{`
-        .sidebar {
+      <div className="sidebar-footer">
+        <div className="user-mini-profile">
+          <div className="avatar-mini">AD</div>
+          <div className="user-details">
+            <span className="name">Admin</span>
+            <span className="role">Online</span>
+          </div>
+        </div>
+        <button className="logout-btn">
+          <LogOut size={18} />
+        </button>
+      </div>
+
+      <style jsx>{`
+        .sidebar-premium {
           width: 280px;
           height: 100vh;
-          background: white;
-          border-right: 1px solid var(--border);
+          background: #0f172a; /* Deep Slate */
           display: flex;
           flex-direction: column;
           position: fixed;
           left: 0;
           top: 0;
           z-index: 100;
+          border-right: 1px solid #1e293b;
         }
         .sidebar-header {
-          padding: 2rem;
-        }
-        .logo {
+          padding: 2rem 1.5rem;
           display: flex;
           align-items: center;
-          gap: 0.75rem;
-          font-weight: 800;
-          font-size: 1.25rem;
-          color: var(--primary);
+          gap: 1rem;
         }
-        .logo-icon {
-          background: var(--primary);
-          color: white;
-          width: 32px;
-          height: 32px;
+        .logo-box {
+          width: 36px;
+          height: 36px;
+          background: white;
+          border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
-          border-radius: 8px;
+        }
+        .logo-inner {
+          width: 18px;
+          height: 18px;
+          background: var(--primary);
+          border-radius: 4px;
+          transform: rotate(45deg);
+        }
+        .logo-text {
+          color: white;
+          font-weight: 700;
+          font-size: 1.25rem;
+          font-family: 'Outfit', sans-serif;
+        }
+        .sidebar-section-label {
+          padding: 0 2rem;
+          font-size: 0.7rem;
+          font-weight: 700;
+          color: #475569;
+          margin-bottom: 1rem;
+          letter-spacing: 0.05em;
         }
         .sidebar-nav {
           flex: 1;
           padding: 0 1rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
         }
         .nav-item {
           display: flex;
           align-items: center;
           gap: 1rem;
-          padding: 0.875rem 1rem;
-          color: #64748b;
-          border-radius: 10px;
-          margin-bottom: 0.5rem;
+          padding: 1rem;
+          color: #94a3b8;
+          border-radius: 12px;
           font-weight: 500;
-          transition: all 0.2s;
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+          font-size: 0.95rem;
         }
         .nav-item:hover {
-          background: var(--muted);
-          color: var(--primary);
+          color: white;
+          background: rgba(255, 255, 255, 0.05);
         }
         .nav-item.active {
-          background: var(--accent);
+          background: linear-gradient(90deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%);
           color: var(--primary);
+          font-weight: 600;
+          border: 1px solid rgba(16, 185, 129, 0.2);
         }
+        .nav-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .nav-arrow {
+          margin-left: auto;
+          opacity: 0.5;
+        }
+        
         .sidebar-footer {
-          padding: 1.5rem 1rem;
-          border-top: 1px solid var(--border);
+          padding: 1.5rem;
+          border-top: 1px solid #1e293b;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
         }
-        .logout {
-          width: 100%;
-          color: #ef4444;
+        .user-mini-profile {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
         }
-        .logout:hover {
-          background: #fef2f2;
-          color: #ef4444;
+        .avatar-mini {
+          width: 36px;
+          height: 36px;
+          background: var(--primary);
+          color: white;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.8rem;
+          font-weight: 700;
+        }
+        .user-details {
+          display: flex;
+          flex-direction: column;
+        }
+        .name { color: white; font-size: 0.9rem; font-weight: 600; }
+        .role { color: var(--primary); font-size: 0.75rem; }
+        
+        .logout-btn {
+          color: #64748b;
+          padding: 0.5rem;
+          border-radius: 8px;
+          transition: 0.2s;
+        }
+        .logout-btn:hover {
+          background: #ef4444;
+          color: white;
         }
       `}</style>
-        </aside>
-    );
+    </aside>
+  );
 }
