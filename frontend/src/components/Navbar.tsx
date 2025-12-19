@@ -2,48 +2,56 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 export default function Navbar() {
-    const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
-    useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 10);
-        };
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-    return (
-        <nav className={`navbar ${isScrolled ? "scrolled" : ""}`}>
-            <div className="container nav-content">
-                <Link href="/" className="logo">
-                    <span className="logo-icon">C</span>
-                    <span className="logo-text">Centrecon</span>
-                </Link>
-                <div className="nav-links">
-                    <Link href="#features">Recursos</Link>
-                    <Link href="#about">Sobre</Link>
-                    <Link href="#contact">Contato</Link>
-                    <Link href="/login" className="btn btn-primary">Entrar</Link>
-                </div>
-            </div>
-            <style jsx>{`
+  return (
+    <nav className={`navbar ${isScrolled ? "scrolled" : ""}`}>
+      <div className="container nav-content">
+        <Link href="/" className="logo">
+          <div className="logo-box">
+            <div className="logo-inner"></div>
+          </div>
+          <span className="logo-text">Centrecon</span>
+        </Link>
+
+        <ul className="nav-menu">
+          <li><Link href="#features">Recursos</Link></li>
+          <li><Link href="#about">Sobre</Link></li>
+          <li><Link href="#solutions">Soluções</Link></li>
+        </ul>
+
+        <div className="nav-actions">
+          <Link href="/login" className="login-link">Entrar</Link>
+          <Link href="#contact" className="btn btn-emerald">Falar Especialista</Link>
+        </div>
+      </div>
+      <style jsx>{`
         .navbar {
           position: fixed;
           top: 0;
           left: 0;
           right: 0;
           z-index: 1000;
-          transition: all 0.3s ease;
           padding: 1.5rem 0;
-          background: rgba(255, 255, 255, 0);
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .navbar.scrolled {
-          background: rgba(255, 255, 255, 0.9);
-          backdrop-filter: blur(10px);
-          padding: 1rem 0;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          padding: 0.8rem 0;
+          background: rgba(255, 255, 255, 0.8);
+          backdrop-filter: blur(20px);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+          box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
         }
         .nav-content {
           display: flex;
@@ -53,35 +61,60 @@ export default function Navbar() {
         .logo {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
+          gap: 1rem;
           font-weight: 800;
           font-size: 1.5rem;
-          color: var(--primary);
+          color: var(--secondary);
+          text-decoration: none;
         }
-        .logo-icon {
-          background: var(--primary);
-          color: white;
-          width: 40px;
-          height: 40px;
+        .logo-box {
+          width: 38px;
+          height: 38px;
+          background: var(--foreground);
+          border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
-          border-radius: 10px;
+          position: relative;
+          overflow: hidden;
         }
-        .nav-links {
+        .logo-inner {
+          width: 20px;
+          height: 20px;
+          background: var(--primary);
+          border-radius: 4px;
+          transform: rotate(45deg);
+        }
+        .nav-menu {
+          display: flex;
+          list-style: none;
+          gap: 2.5rem;
+        }
+        .nav-menu a {
+          font-weight: 600;
+          font-size: 0.95rem;
+          color: var(--muted);
+          transition: 0.3s;
+          text-decoration: none;
+        }
+        .nav-menu a:hover {
+          color: var(--primary);
+        }
+        .nav-actions {
           display: flex;
           align-items: center;
           gap: 2rem;
         }
-        .nav-links a {
-          font-weight: 500;
+        .login-link {
+          font-weight: 700;
           color: var(--foreground);
-          transition: color 0.2s;
+          text-decoration: none;
+          font-size: 0.95rem;
         }
-        .nav-links a:hover {
-          color: var(--primary);
+        @media (max-width: 968px) {
+          .nav-menu { display: none; }
         }
       `}</style>
-        </nav>
-    );
+    </nav>
+  );
 }
