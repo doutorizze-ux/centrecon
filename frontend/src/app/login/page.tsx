@@ -3,68 +3,99 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export default function LoginPage() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log("Login with:", email, password);
-        // Redirect to dashboard logic here
-    };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    return (
-        <div className="login-container">
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="login-card"
-            >
-                <Link href="/" className="login-logo">
-                    <span className="logo-icon">C</span>
-                    <span className="logo-text">Centrecon</span>
-                </Link>
-                <h1>Bem-vindo de volta</h1>
-                <p>Acesse sua conta para gerenciar sua segurança.</p>
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      const response = await axios.post(`${apiUrl}/api/auth/login`, {
+        email,
+        password,
+      });
 
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="email">E-mail</label>
-                        <input
-                            type="email"
-                            id="email"
-                            placeholder="exemplo@email.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="password">Senha</label>
-                        <input
-                            type="password"
-                            id="password"
-                            placeholder="••••••••"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-options">
-                        <label className="checkbox-label">
-                            <input type="checkbox" /> Lembrar de mim
-                        </label>
-                        <a href="#" className="forgot-password">Esqueceu a senha?</a>
-                    </div>
-                    <button type="submit" className="btn btn-primary btn-full">Entrar</button>
-                </form>
+      const { token, user } = response.data;
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
-                <p className="signup-text">
-                    Não tem uma conta? <a href="#">Entre em contato</a>
-                </p>
-            </motion.div>
-            <style jsx>{`
+      router.push("/dashboard");
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Erro ao fazer login. Verifique suas credenciais.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="login-container">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="login-card"
+      >
+        <Link href="/" className="login-logo">
+          <span className="logo-icon">C</span>
+          <span className="logo-text">Centrecon</span>
+        </Link>
+        <h1>Bem-vindo de volta</h1>
+        <p>Acesse sua conta para gerenciar sua segurança.</p>
+
+        {error && <div className="error-message">{error}</div>}
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="email">E-mail</label>
+            <input
+              type="email"
+              id="email"
+              placeholder="exemplo@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Senha</label>
+            <input
+              type="password"
+              id="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-options">
+            <label className="checkbox-label">
+              <input type="checkbox" /> Lembrar de mim
+            </label>
+            <a href="#" className="forgot-password">Esqueceu a senha?</a>
+          </div>
+          <button
+            type="submit"
+            className="btn btn-primary btn-full"
+            disabled={loading}
+          >
+            {loading ? "Entrando..." : "Entrar"}
+          </button>
+        </form>
+
+        <p className="signup-text">
+          Não tem uma conta? <a href="#">Entre em contato</a>
+        </p>
+      </motion.div>
+      <style jsx>{`
         .login-container {
           min-height: 100vh;
           display: flex;
@@ -153,7 +184,16 @@ export default function LoginPage() {
           color: var(--primary);
           font-weight: 600;
         }
+        .error-message {
+          background: #fef2f2;
+          color: #ef4444;
+          padding: 0.75rem;
+          border-radius: 10px;
+          margin-bottom: 1.5rem;
+          font-size: 0.875rem;
+          font-weight: 500;
+        }
       `}</style>
-        </div>
-    );
+    </div>
+  );
 }
