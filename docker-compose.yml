@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=centrecon
+      - POSTGRES_PASSWORD=centrecon_pass
+      - POSTGRES_DB=centrecon
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - centrecon_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3001
+      - DATABASE_URL=postgresql://centrecon:centrecon_pass@database:5432/centrecon?schema=public
+      - JWT_SECRET=${JWT_SECRET}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - whatsapp_auth:/app/auth_info_baileys
+    depends_on:
+      - database
+    networks:
+      - centrecon_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    networks:
+      - centrecon_network
+
+networks:
+  centrecon_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  whatsapp_auth:
